@@ -49,7 +49,7 @@ app.post('/', function (req, res) {
                     }
                 });
             let message = {
-                from: fields.get('options') == 'default' ? '"Mail 👻" <mail@karol.gay>' : fields.get('from'),
+                from: fields.get('options') == 'default' ? '"Mailer 📨" <mailer@karol.gay>' : fields.get('from'),
                 to: fields.get('to'),
                 subject: fields.get('subject'),
                 text: fields.get('text'),
