@@ -18,6 +18,7 @@ app.post('/', function (req, res) {
     var form = new formidable.IncomingForm(),
         files = [],
         fields = new Map();
+    //form.multiples = true;
 
 
     form
@@ -27,7 +28,7 @@ app.post('/', function (req, res) {
         .on('file', function (field, file) {
             files.push(file);
         })
-        .on('end', async function () {
+        .parse(req, async function () {
             let transporter;
             if (fields.get('options') == 'default')
                 transporter = nodemailer.createTransport({
@@ -35,8 +36,8 @@ app.post('/', function (req, res) {
                     port: 587,
                     secure: false,
                     auth: require('./smtp-cred.json')
-
-
+        
+        
                 });
             else
                 transporter = nodemailer.createTransport({
@@ -55,6 +56,7 @@ app.post('/', function (req, res) {
                 text: fields.get('text'),
                 attachments: []
             };
+            console.log(files);
             files.forEach(element => {
                 if (element.originalFilename != '')
                     message.attachments.push({
@@ -62,18 +64,20 @@ app.post('/', function (req, res) {
                         path: element.filepath
                     });
             });
-
+        
             try {
-                let info = await transporter.sendMail(message);
+                await transporter.sendMail(message);
                 res.redirect('/sent.html?error=0');
+        
             } catch (ex) {
                 res.redirect('/sent.html?error=1&details=' + encodeURIComponent(ex));
             }
-
-
+            res.end();
+        
+        
         });
-    form.parse(req);
+
+
+
 
 });
-
-//app.listen(2137);
