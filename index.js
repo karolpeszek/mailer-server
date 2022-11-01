@@ -49,7 +49,7 @@ app.post('/', function (req, res) {
                     }
                 });
             let message = {
-                from: fields.get('options') == 'default' ? "mailer@karol.gay" : fields.get('from'),
+                from: fields.get('options') == 'default' ? '"Mail 👻" <mail@karol.gay>' : fields.get('from'),
                 to: fields.get('to'),
                 subject: fields.get('subject'),
                 text: fields.get('text'),
@@ -63,9 +63,6 @@ app.post('/', function (req, res) {
                     });
             });
 
-            console.log(message);
-
-            
             try {
                 let info = await transporter.sendMail(message);
                 res.redirect('/sent.html?error=0');
@@ -75,7 +72,6 @@ app.post('/', function (req, res) {
 
 
         });
-    files = [];
     form.parse(req);
 
 });
