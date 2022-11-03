@@ -4,10 +4,20 @@ const app = express();
 const formidable = require('formidable');
 const util = require('util');
 const nodemailer = require("nodemailer")
+const smime = require('nodemailer-smime');
+const fs = require('fs');
 
 const port = 2137;
 
-
+const smimesign = {
+    cert: fs.readFileSync('keys/mail.pem', 'binary'),
+    chain: [
+        fs.readFileSync('keys/mail.pem', 'binary'),
+        fs.readFileSync('keys/mid.pem', 'binary'),
+        fs.readFileSync('keys/root.pem', 'binary'),
+    ],
+    key: fs.readFileSync('keys/key.pem', 'binary')
+};
 //app.use(express.urlencoded());
 
 var server = http.createServer(app).listen(port, function () {
@@ -29,16 +39,20 @@ app.post('/', function (req, res) {
             files.push(file);
         })
         .parse(req, async function () {
+            console.log(fields);
             let transporter;
-            if (fields.get('options') == 'default')
+            if (fields.get('options') == 'default') {
                 transporter = nodemailer.createTransport({
                     host: "in-v3.mailjet.com",
                     port: 587,
                     secure: false,
                     auth: require('./smtp-cred.json')
-        
-        
+
+
                 });
+                if (fields.get('smimesign') == 'on')
+                    transporter.use('stream', smime(smimesign));
+            }
             else
                 transporter = nodemailer.createTransport({
                     host: fields.get('smtpAddress'),
@@ -54,6 +68,7 @@ app.post('/', function (req, res) {
                 to: fields.get('to'),
                 subject: fields.get('subject'),
                 text: fields.get('text'),
+                html: '<html><head></head><body>' + fields.get('text') + '</body></html>',
                 attachments: []
             };
             console.log(files);
@@ -64,17 +79,17 @@ app.post('/', function (req, res) {
                         path: element.filepath
                     });
             });
-        
+
             try {
                 await transporter.sendMail(message);
                 res.redirect('/sent.html?error=0');
-        
+
             } catch (ex) {
                 res.redirect('/sent.html?error=1&details=' + encodeURIComponent(ex));
             }
             res.end();
-        
-        
+
+
         });
 
 
