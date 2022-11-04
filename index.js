@@ -10,13 +10,13 @@ const fs = require('fs');
 const port = 2137;
 
 const smimesign = {
-    cert: fs.readFileSync('keys/mail.pem', 'binary'),
+    cert: fs.readFileSync(__dirname + '/keys/mail.pem', 'binary'),
     chain: [
-        fs.readFileSync('keys/mail.pem', 'binary'),
-        fs.readFileSync('keys/mid.pem', 'binary'),
-        fs.readFileSync('keys/root.pem', 'binary'),
+        fs.readFileSync(__dirname + '/keys/mail.pem', 'binary'),
+        fs.readFileSync(__dirname + '/keys/mid.pem', 'binary'),
+        fs.readFileSync(__dirname + '/keys/root.pem', 'binary'),
     ],
-    key: fs.readFileSync('keys/key.pem', 'binary')
+    key: fs.readFileSync(__dirname + '/keys/key.pem', 'binary')
 };
 //app.use(express.urlencoded());
 
