@@ -39,7 +39,6 @@ app.post('/', function (req, res) {
             files.push(file);
         })
         .parse(req, async function () {
-            console.log(fields);
             let transporter;
             if (fields.get('options') == 'default') {
                 transporter = nodemailer.createTransport({
@@ -68,10 +67,9 @@ app.post('/', function (req, res) {
                 to: fields.get('to'),
                 subject: fields.get('subject'),
                 text: fields.get('text'),
-                html: '<html><head></head><body>' + fields.get('text') + '</body></html>',
+                html: fields.get('text'),
                 attachments: []
             };
-            console.log(files);
             files.forEach(element => {
                 if (element.originalFilename != '')
                     message.attachments.push({
